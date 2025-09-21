@@ -213,31 +213,44 @@ export function Chatbot() {
   )
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return
+    const messageText = inputValue.trim()
+    if (!messageText) return
 
+    // Clear input immediately
+    setInputValue("")
+    
+    // Create user message with a unique ID based on timestamp and random number
     const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputValue,
+      id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      text: messageText,
       sender: "user",
       timestamp: new Date(),
     }
 
-    setMessages((prev) => [...prev, userMessage])
-    const currentInput = inputValue
-    setInputValue("")
+    // Update messages with the new user message
+    setMessages(prevMessages => [...prevMessages, userMessage])
     setIsLoading(true)
 
-    const botResponse = await getBotResponse(currentInput)
-    const botMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      text: botResponse,
-      sender: "bot",
-      timestamp: new Date(),
-    }
+    try {
+      // Get bot response
+      const botResponse = await getBotResponse(messageText)
+      
+      // Create bot message with a unique ID
+      const botMessage: Message = {
+        id: `bot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        text: botResponse,
+        sender: "bot",
+        timestamp: new Date(),
+      }
 
-    setMessages((prev) => [...prev, botMessage])
-    setIsLoading(false)
-    speakText(botResponse)
+      // Update messages with the bot's response
+      setMessages(prevMessages => [...prevMessages, botMessage])
+      speakText(botResponse)
+    } catch (error) {
+      console.error("Error in handleSendMessage:", error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
