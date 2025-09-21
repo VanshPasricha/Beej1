@@ -292,15 +292,26 @@ export function Chatbot() {
           </div>
 
           {!isCollapsed && (
-          <ScrollArea className="flex-1 p-4 bg-white/80">
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`max-w-[80%] p-3 rounded-xl shadow-sm ${
-                      message.sender === "user" ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-900"
-                    } border border-black/5`}
-                  >
+            <ScrollArea className="flex-1 p-4 bg-white/80">
+              <div className="space-y-4">
+                {messages.map((message) => (
+                  <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`max-w-[80%] p-3 rounded-xl shadow-sm ${
+                        message.sender === "user" ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-900"
+                      } border border-black/5`}
+                    >
+                      <p className="text-sm">{message.text}</p>
+                      {message.sender === "bot" && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => speakText(message.text)}
+                          className="mt-1 h-6 w-6 p-0 hover:bg-gray-200"
+                        >
+                          <Volume2 className="h-3 w-3" />
+                        </Button>
+                      )}
                     <p className="text-sm">{message.text}</p>
                     {message.sender === "bot" && (
                       <Button
