@@ -9,6 +9,7 @@
   NETLIFY_USE_NPM = "true"
   NETLIFY_USE_PNPM = "false"
   NPM_FLAGS = "--legacy-peer-deps"
+  NO_DB = "true"
 
 # Enable Netlify's official Next.js plugin
 [[plugins]]
