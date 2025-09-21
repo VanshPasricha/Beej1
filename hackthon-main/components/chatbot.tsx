@@ -1,4 +1,4 @@
-    "use client"
+"use client"
 
 import type React from "react"
 import { useState, useRef, useEffect, useCallback } from "react"
@@ -6,7 +6,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { MessageCircle, X, Send, Mic, MicOff, Volume2, ChevronDown, ChevronUp } from "lucide-react"
+import {
+  MessageCircle,
+  X,
+  Send,
+  Mic,
+  MicOff,
+  Volume2,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react"
 import { useTranslation } from "@/hooks/use-translation"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { useLanguage } from "@/contexts/language-context"
@@ -28,10 +37,10 @@ const getSpeechLocale = (lang: string) => {
       return "ta-IN"
     case "kn":
       return "kn-IN"
-    case "gom": // Konkani
+    case "gom":
       return "kok-IN"
-    case "tcy": // Tulu (fallback to Kannada locale if Tulu voice not available)
-      return "kn-IN"
+    case "tcy":
+      return "kn-IN" // fallback
     case "en":
     default:
       return "en-US"
@@ -58,6 +67,64 @@ const getLanguageName = (lang: string) => {
   }
 }
 
+/* --- ChatMessage Component --- */
+interface ChatMessageProps {
+  message: Message
+  onSpeak?: (text: string) => void
+}
+
+function ChatMessage({ message, onSpeak }: ChatMessageProps) {
+  const isUser = message.sender === "user"
+
+  return (
+    <div
+      className={`flex items-end gap-2 mb-3 ${
+        isUser ? "justify-end" : "justify-start"
+      }`}
+    >
+      {!isUser && (
+        <div className="h-8 w-8 flex items-center justify-center rounded-full bg-green-500 text-white text-sm font-bold">
+          🤖
+        </div>
+      )}
+
+      <div
+        className={`max-w-[75%] p-3 rounded-2xl shadow-sm ${
+          isUser
+            ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-br-sm"
+            : "bg-gray-100 text-gray-900 rounded-bl-sm"
+        }`}
+      >
+        <p className="text-sm">{message.text}</p>
+
+        <div className="flex justify-between items-center mt-1 text-[10px] opacity-70">
+          <span>
+            {message.timestamp.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </span>
+          {message.sender === "bot" && (
+            <button
+              onClick={() => onSpeak?.(message.text)}
+              className="ml-2 hover:opacity-100 opacity-70"
+            >
+              <Volume2 className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {isUser && (
+        <div className="h-8 w-8 flex items-center justify-center rounded-full bg-orange-500 text-white text-sm font-bold">
+          U
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* --- Chatbot Component --- */
 export function Chatbot() {
   const { t } = useTranslation()
   const { lang } = useLanguage()
@@ -104,17 +171,11 @@ export function Chatbot() {
         setIsListening(false)
       }
 
-      recognitionRef.current.onerror = () => {
-        setIsListening(false)
-      }
-
-      recognitionRef.current.onend = () => {
-        setIsListening(false)
-      }
+      recognitionRef.current.onerror = () => setIsListening(false)
+      recognitionRef.current.onend = () => setIsListening(false)
     }
   }, [lang])
 
-  // Announce language changes in the thread (skip on first mount)
   useEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true
@@ -154,25 +215,15 @@ export function Chatbot() {
       const voices = window.speechSynthesis.getVoices()
       const preferredVoice =
         voices.find((voice) => voice.lang === locale) ||
-        voices.find((voice) => voice.lang.startsWith(locale.split("-")[0])) ||
+        voices.find((voice) =>
+          voice.lang.startsWith(locale.split("-")[0])
+        ) ||
         voices.find((voice) => voice.lang === "en-US")
-      if (preferredVoice) {
-        utterance.voice = preferredVoice
-      }
+      if (preferredVoice) utterance.voice = preferredVoice
 
       utterance.rate = 0.9
       utterance.pitch = 1.1
       utterance.volume = 1.0
-
-      utterance.onstart = () => {
-        console.log("Speech started")
-      }
-      utterance.onend = () => {
-        console.log("Speech ended")
-      }
-      utterance.onerror = (e) => {
-        console.error("Speech synthesis error:", e.error)
-      }
 
       speechSynthesis.speak(utterance)
     }
@@ -183,14 +234,16 @@ export function Chatbot() {
       try {
         const response = await fetch("/api/chat", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             messages: [
               {
                 role: "system",
-                content: `You are a helpful farming assistant. Always reply in ${getLanguageName(lang)} (${getSpeechLocale(lang)}). Use simple, clear wording.`,
+                content: `You are a helpful farming assistant. Always reply in ${getLanguageName(
+                  lang
+                )} (${getSpeechLocale(
+                  lang
+                )}). Use simple, clear wording.`,
               },
               { role: "user", content: userMessage },
             ],
@@ -203,7 +256,10 @@ export function Chatbot() {
         }
 
         const data = await response.json()
-        return data.choices?.[0]?.message?.content ?? "Sorry, I couldn't generate a response."
+        return (
+          data.choices?.[0]?.message?.content ??
+          "Sorry, I couldn't generate a response."
+        )
       } catch (error) {
         console.error("Error fetching from Chat API:", error)
         return "Sorry, I am having trouble responding right now."
@@ -215,36 +271,30 @@ export function Chatbot() {
   const handleSendMessage = async () => {
     const messageText = inputValue.trim()
     if (!messageText) return
-
-    // Clear input immediately
     setInputValue("")
-    
-    // Create user message with a unique ID based on timestamp and random number
+
     const userMessage: Message = {
-      id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `user-${Date.now()}-${Math.random()
+        .toString(36)
+        .substr(2, 9)}`,
       text: messageText,
       sender: "user",
       timestamp: new Date(),
     }
-
-    // Update messages with the new user message
-    setMessages(prevMessages => [...prevMessages, userMessage])
+    setMessages((prev) => [...prev, userMessage])
     setIsLoading(true)
 
     try {
-      // Get bot response
       const botResponse = await getBotResponse(messageText)
-      
-      // Create bot message with a unique ID
       const botMessage: Message = {
-        id: `bot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `bot-${Date.now()}-${Math.random()
+          .toString(36)
+          .substr(2, 9)}`,
         text: botResponse,
         sender: "bot",
         timestamp: new Date(),
       }
-
-      // Update messages with the bot's response
-      setMessages(prevMessages => [...prevMessages, botMessage])
+      setMessages((prev) => [...prev, botMessage])
       speakText(botResponse)
     } catch (error) {
       console.error("Error in handleSendMessage:", error)
@@ -253,16 +303,18 @@ export function Chatbot() {
     }
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSendMessage()
-    }
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSendMessage()
   }
 
   return (
     <>
+      {/* Floating open button */}
       <Button
-        onClick={() => { setIsOpen(true); setIsCollapsed(false) }}
+        onClick={() => {
+          setIsOpen(true)
+          setIsCollapsed(false)
+        }}
         className={`fixed bottom-6 right-6 h-14 w-14 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-lg z-50 ${
           isOpen ? "hidden" : "flex"
         }`}
@@ -273,21 +325,21 @@ export function Chatbot() {
 
       {isOpen && (
         <Card className="fixed bottom-6 right-6 w-96 max-w-[95vw] h-[500px] flex flex-col shadow-2xl z-50 border-2 border-orange-200 rounded-2xl overflow-hidden">
+          {/* Header */}
           <div className="flex items-center justify-between p-3 bg-gradient-to-r from-orange-500 to-green-500 text-white relative">
             <div className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5" />
               <h3 className="font-semibold">{t("chatbot.title")}</h3>
             </div>
             <Button
-  variant="ghost"
-  size="icon"
-  onClick={() => setIsOpen(false)}
-  className="absolute -top-3 -right-3 bg-white text-red-500 rounded-full p-1 h-8 w-8 shadow-md hover:bg-red-100 border-2 border-white"
-  aria-label="Close"
->
-  <X className="h-5 w-5" />
-</Button>
-
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(false)}
+              className="absolute -top-3 -right-3 bg-white text-red-500 rounded-full p-1 h-8 w-8 shadow-md hover:bg-red-100 border-2 border-white"
+              aria-label="Close"
+            >
+              <X className="h-5 w-5" />
+            </Button>
             <div className="flex items-center gap-3">
               <div className="bg-white/90 rounded-full px-2 py-1">
                 <LanguageSwitcher inline />
@@ -299,57 +351,55 @@ export function Chatbot() {
                 className="text-white hover:bg-white/20"
                 aria-label={isCollapsed ? "Expand" : "Collapse"}
               >
-                {isCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                {isCollapsed ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
 
+          {/* Messages */}
           {!isCollapsed && (
             <ScrollArea className="flex-1 p-4 bg-white/80">
-              <div className="space-y-4">
-                {messages.map((message) => (
-                  <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
-                    <div
-                      className={`max-w-[80%] p-3 rounded-xl shadow-sm ${
-                        message.sender === "user" ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-900"
-                      } border border-black/5`}
-                    >
-                      <p className="text-sm">{message.text}</p>
-                      {message.sender === "bot" && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => speakText(message.text)}
-                          className="mt-1 h-6 w-6 p-0 hover:bg-gray-200"
-                        >
-                          <Volume2 className="h-3 w-3" />
-                        </Button>
-                      )}
-                    </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-gray-100 p-3 rounded-lg">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+              <div className="space-y-2">
+                {messages.map((msg) => (
+                  <ChatMessage
+                    key={msg.id}
+                    message={msg}
+                    onSpeak={speakText}
+                  />
+                ))}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-gray-100 p-3 rounded-lg">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div
+                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.1s" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.2s" }}
+                        ></div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-          </ScrollArea>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            </ScrollArea>
           )}
 
+          {/* Input */}
           <div className="p-3 border-t bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70">
             <div className="flex gap-2 items-center">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyDown}
                 placeholder={t("chatbot.placeholder")}
                 className="flex-1 rounded-full"
               />
@@ -357,11 +407,23 @@ export function Chatbot() {
                 onClick={isListening ? stopListening : startListening}
                 variant="outline"
                 size="sm"
-                className={`rounded-full ${isListening ? "bg-red-100 border-red-300" : "hover:bg-gray-50"}`}
-                >
-                {isListening ? <MicOff className="h-4 w-4 text-red-600" /> : <Mic className="h-4 w-4" />}
+                className={`rounded-full ${
+                  isListening
+                    ? "bg-red-100 border-red-300"
+                    : "hover:bg-gray-50"
+                }`}
+              >
+                {isListening ? (
+                  <MicOff className="h-4 w-4 text-red-600" />
+                ) : (
+                  <Mic className="h-4 w-4" />
+                )}
               </Button>
-              <Button onClick={handleSendMessage} size="sm" className="rounded-full bg-orange-600 hover:bg-orange-700">
+              <Button
+                onClick={handleSendMessage}
+                size="sm"
+                className="rounded-full bg-orange-600 hover:bg-orange-700"
+              >
                 <Send className="h-4 w-4" />
               </Button>
             </div>
