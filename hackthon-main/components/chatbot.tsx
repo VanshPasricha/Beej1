@@ -269,7 +269,7 @@ export function Chatbot() {
   variant="ghost"
   size="icon"
   onClick={() => setIsOpen(false)}
-  className="absolute top-2 right-2 bg-white text-red-500 rounded-full p-1 h-8 w-8 shadow-md hover:bg-red-100"
+  className="absolute -top-3 -right-3 bg-white text-red-500 rounded-full p-1 h-8 w-8 shadow-md hover:bg-red-100 border-2 border-white"
   aria-label="Close"
 >
   <X className="h-5 w-5" />
@@ -312,18 +312,7 @@ export function Chatbot() {
                           <Volume2 className="h-3 w-3" />
                         </Button>
                       )}
-                    <p className="text-sm">{message.text}</p>
-                    {message.sender === "bot" && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => speakText(message.text)}
-                        className="mt-1 h-6 w-6 p-0 hover:bg-gray-200"
-                      >
-                        <Volume2 className="h-3 w-3" />
-                      </Button>
-                    )}
-                  </div>
+                    </div>
                 </div>
               ))}
               {isLoading && (
