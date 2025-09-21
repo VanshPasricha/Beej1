@@ -260,11 +260,47 @@ export function Chatbot() {
 
       {isOpen && (
         <Card className="fixed bottom-6 right-6 w-96 max-w-[95vw] h-[500px] flex flex-col shadow-2xl z-50 border-2 border-orange-200 rounded-2xl overflow-hidden">
-          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-orange-500 to-green-500 text-white">
+          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-orange-500 to-green-500 text-white relative">
             <div className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5" />
               <h3 className="font-semibold">{t("chatbot.title")}</h3>
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(false)}
+              className="absolute top-2 right-2 bg-white text-red-500 rounded-full p-1 h-6 w-6 shadow-md hover:bg-red-100"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(false)}
+              className="absolute top-2 right-12 bg-white text-red-500 rounded-full p-1 h-10 w-10 shadow-md hover:bg-red-100"
+              aria-label="Close"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(false)}
+              className="absolute top-2 right-2 bg-white text-red-500 rounded-full p-1 h-10 w-10 shadow-md hover:bg-red-100"
+              aria-label="Close"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={() => setIsOpen(false)}
+              className="absolute top-2 right-2 bg-white text-red-500 rounded-full p-1 h-10 w-10 shadow-md hover:bg-red-100"
+              aria-label="Close"
+            >
+              <X className="h-8 w-8" />
+            </Button>
             <div className="flex items-center gap-3">
               <div className="bg-white/90 rounded-full px-2 py-1">
                 <LanguageSwitcher inline />
@@ -277,9 +313,6 @@ export function Chatbot() {
                 aria-label={isCollapsed ? "Expand" : "Collapse"}
               >
                 {isCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </Button>
-              <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="text-white hover:bg-white/20" aria-label="Close">
-                <X className="h-4 w-4" />
               </Button>
             </div>
           </div>
