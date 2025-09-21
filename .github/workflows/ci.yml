@@ -1,0 +1,26 @@
+name: CI
+on:
+  push:
+    branches: [ cleaned-main ]
+  pull_request:
+    branches: [ cleaned-main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hackthon-main
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: hackthon-main/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Build
+        run: npm run build
