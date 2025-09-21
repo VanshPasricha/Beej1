@@ -27,8 +27,9 @@ pnpm-debug.log*
 # Build caches
 .cache/
 
-# Generated locks (keep only one lockfile tracked if desired)
-package-lock.json
+# Lockfiles (commit package-lock.json for reproducible CI builds)
+# If you use a different package manager, ignore its lockfile instead.
+# pnpm-lock.yaml is ignored; npm lockfile is tracked.
 pnpm-lock.yaml
 
 # Misc
