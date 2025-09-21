@@ -1,0 +1,217 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* BeejSetu Custom Colors - Orange & Green Theme */
+  --background: oklch(0.99 0.01 85); /* Very light orange tint */
+  --foreground: oklch(0.15 0.02 85);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.02 85);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.02 85);
+
+  /* Primary Orange */
+  --primary: oklch(0.65 0.18 45); /* Orange-500 equivalent */
+  --primary-foreground: oklch(0.99 0.01 85);
+
+  /* Secondary Green */
+  --secondary: oklch(0.55 0.15 145); /* Green-600 equivalent */
+  --secondary-foreground: oklch(0.99 0.01 85);
+
+  --muted: oklch(0.97 0.01 85);
+  --muted-foreground: oklch(0.55 0.02 85);
+  --accent: oklch(0.97 0.01 85);
+  --accent-foreground: oklch(0.2 0.02 85);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --border: oklch(0.92 0.01 85);
+  --input: oklch(0.92 0.01 85);
+  --ring: oklch(0.65 0.18 45); /* Orange ring */
+
+  /* Chart colors with orange/green theme */
+  --chart-1: oklch(0.65 0.18 45); /* Orange */
+  --chart-2: oklch(0.55 0.15 145); /* Green */
+  --chart-3: oklch(0.75 0.12 65); /* Yellow-orange */
+  --chart-4: oklch(0.45 0.18 165); /* Dark green */
+  --chart-5: oklch(0.85 0.08 35); /* Light orange */
+
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.65 0.18 45);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.dark {
+  --background: oklch(0.12 0.02 85);
+  --foreground: oklch(0.98 0.01 85);
+  --card: oklch(0.15 0.02 85);
+  --card-foreground: oklch(0.98 0.01 85);
+  --popover: oklch(0.15 0.02 85);
+  --popover-foreground: oklch(0.98 0.01 85);
+  --primary: oklch(0.75 0.15 45); /* Lighter orange for dark mode */
+  --primary-foreground: oklch(0.12 0.02 85);
+  --secondary: oklch(0.65 0.12 145); /* Lighter green for dark mode */
+  --secondary-foreground: oklch(0.12 0.02 85);
+  --muted: oklch(0.25 0.02 85);
+  --muted-foreground: oklch(0.7 0.01 85);
+  --accent: oklch(0.25 0.02 85);
+  --accent-foreground: oklch(0.98 0.01 85);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.25 0.02 85);
+  --input: oklch(0.25 0.02 85);
+  --ring: oklch(0.75 0.15 45);
+  --chart-1: oklch(0.75 0.15 45);
+  --chart-2: oklch(0.65 0.12 145);
+  --chart-3: oklch(0.85 0.1 65);
+  --chart-4: oklch(0.55 0.15 165);
+  --chart-5: oklch(0.95 0.06 35);
+  --sidebar: oklch(0.15 0.02 85);
+  --sidebar-foreground: oklch(0.98 0.01 85);
+  --sidebar-primary: oklch(0.75 0.15 45);
+  --sidebar-primary-foreground: oklch(0.12 0.02 85);
+  --sidebar-accent: oklch(0.25 0.02 85);
+  --sidebar-accent-foreground: oklch(0.98 0.01 85);
+  --sidebar-border: oklch(0.25 0.02 85);
+  --sidebar-ring: oklch(0.45 0.02 85);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50 transition-colors transition-shadow transition-transform duration-200 ease-out;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-orange-300 rounded-md;
+  }
+}
+
+/* Motion-safe reveal animations */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 400ms ease, transform 400ms ease;
+    will-change: opacity, transform;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Subtle card hover */
+.card-hover {
+  @apply hover:shadow-lg hover:scale-[1.01];
+}
+
+/* Hairline section divider helper */
+.section-divider {
+  @apply border-t border-gray-100 pt-6;
+}
+
+/* One-off fade-in up animation for page content */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 320ms ease-out both;
+}
+
+/* Button press micro-interaction */
+.button-press:active {
+  transform: scale(0.99);
+}
+
+/* Simple skeleton utility */
+.skeleton {
+  @apply animate-pulse bg-gray-200 rounded-md;
+}
+
+/* Staggered reveal for children */
+.stagger > * {
+  opacity: 0;
+  animation: fade-in-up 380ms ease-out forwards;
+}
+.stagger > *:nth-child(1) { animation-delay: 60ms; }
+.stagger > *:nth-child(2) { animation-delay: 110ms; }
+.stagger > *:nth-child(3) { animation-delay: 160ms; }
+.stagger > *:nth-child(4) { animation-delay: 210ms; }
+.stagger > *:nth-child(5) { animation-delay: 260ms; }
+.stagger > *:nth-child(6) { animation-delay: 310ms; }
+.stagger > *:nth-child(7) { animation-delay: 360ms; }
+.stagger > *:nth-child(8) { animation-delay: 410ms; }
+
+/* Custom BeejSetu styles */
+.beejsetu-gradient {
+  background: linear-gradient(135deg, #fed7aa 0%, #dcfce7 50%, #fed7aa 100%);
+}
+
+.beejsetu-card-shadow {
+  box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.1), 0 4px 6px -2px rgba(34, 197, 94, 0.05);
+}
