@@ -266,41 +266,15 @@ export function Chatbot() {
               <h3 className="font-semibold">{t("chatbot.title")}</h3>
             </div>
             <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(false)}
-              className="absolute top-2 right-2 bg-white text-red-500 rounded-full p-1 h-6 w-6 shadow-md hover:bg-red-100"
-              aria-label="Close"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(false)}
-              className="absolute top-2 right-12 bg-white text-red-500 rounded-full p-1 h-10 w-10 shadow-md hover:bg-red-100"
-              aria-label="Close"
-            >
-              <X className="h-6 w-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(false)}
-              className="absolute top-2 right-2 bg-white text-red-500 rounded-full p-1 h-10 w-10 shadow-md hover:bg-red-100"
-              aria-label="Close"
-            >
-              <X className="h-6 w-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="lg"
-              onClick={() => setIsOpen(false)}
-              className="absolute top-2 right-2 bg-white text-red-500 rounded-full p-1 h-10 w-10 shadow-md hover:bg-red-100"
-              aria-label="Close"
-            >
-              <X className="h-8 w-8" />
-            </Button>
+  variant="ghost"
+  size="icon"
+  onClick={() => setIsOpen(false)}
+  className="absolute top-2 right-2 bg-white text-red-500 rounded-full p-1 h-8 w-8 shadow-md hover:bg-red-100"
+  aria-label="Close"
+>
+  <X className="h-5 w-5" />
+</Button>
+
             <div className="flex items-center gap-3">
               <div className="bg-white/90 rounded-full px-2 py-1">
                 <LanguageSwitcher inline />
