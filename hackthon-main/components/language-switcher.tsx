@@ -10,10 +10,10 @@ export function LanguageSwitcher({ inline = false }: { inline?: boolean }) {
   return (
     <div className={inline ? "inline-flex items-center gap-2" : "flex items-center gap-2"}>
       <Globe className="w-4 h-4 text-gray-600" />
-      <span className="text-sm text-gray-700 hidden md:inline">{t("language", "Language")}</span>
+      <span className="text-sm text-gray-700">{t("language", "Language")}</span>
       <div className="min-w-[160px]">
         <Select value={lang} onValueChange={(val) => setLang(val as Lang)}>
-          <SelectTrigger>
+          <SelectTrigger aria-label={t("language", "Language")}>
             <SelectValue placeholder={t("language", "Language")} />
           </SelectTrigger>
           <SelectContent>

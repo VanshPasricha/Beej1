@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { MessageCircle, X, Send, Mic, MicOff, Volume2 } from "lucide-react"
+import { MessageCircle, X, Send, Mic, MicOff, Volume2, ChevronDown, ChevronUp } from "lucide-react"
 import { useTranslation } from "@/hooks/use-translation"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { useLanguage } from "@/contexts/language-context"
@@ -62,12 +62,14 @@ export function Chatbot() {
   const { t } = useTranslation()
   const { lang } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState("")
   const [isListening, setIsListening] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
+  const didMountRef = useRef(false)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -110,6 +112,21 @@ export function Chatbot() {
         setIsListening(false)
       }
     }
+  }, [lang])
+
+  // Announce language changes in the thread (skip on first mount)
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true
+      return
+    }
+    const notice: Message = {
+      id: `lang-${Date.now()}`,
+      text: `${t("language")} set to ${getLanguageName(lang)}.`,
+      sender: "bot",
+      timestamp: new Date(),
+    }
+    setMessages((prev) => [...prev, notice])
   }, [lang])
 
   const startListening = () => {
@@ -232,37 +249,50 @@ export function Chatbot() {
   return (
     <>
       <Button
-        onClick={() => setIsOpen(true)}
+        onClick={() => { setIsOpen(true); setIsCollapsed(false) }}
         className={`fixed bottom-6 right-6 h-14 w-14 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-lg z-50 ${
           isOpen ? "hidden" : "flex"
         }`}
+        aria-label="Open AgriBot Assistant"
       >
         <MessageCircle className="h-6 w-6" />
       </Button>
 
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 w-96 h-[500px] flex flex-col shadow-2xl z-50 border-orange-200">
-          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-500 to-green-500 text-white rounded-t-lg">
+        <Card className="fixed bottom-6 right-6 w-96 max-w-[95vw] h-[500px] flex flex-col shadow-2xl z-50 border-2 border-orange-200 rounded-2xl overflow-hidden">
+          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-orange-500 to-green-500 text-white">
             <div className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5" />
               <h3 className="font-semibold">{t("chatbot.title")}</h3>
             </div>
             <div className="flex items-center gap-3">
-              <LanguageSwitcher inline />
-              <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)} className="text-white hover:bg-white/20">
+              <div className="bg-white/90 rounded-full px-2 py-1">
+                <LanguageSwitcher inline />
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsCollapsed((c) => !c)}
+                className="text-white hover:bg-white/20"
+                aria-label={isCollapsed ? "Expand" : "Collapse"}
+              >
+                {isCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="text-white hover:bg-white/20" aria-label="Close">
                 <X className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          <ScrollArea className="flex-1 p-4">
+          {!isCollapsed && (
+          <ScrollArea className="flex-1 p-4 bg-white/80">
             <div className="space-y-4">
               {messages.map((message) => (
                 <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
                   <div
-                    className={`max-w-[80%] p-3 rounded-lg ${
+                    className={`max-w-[80%] p-3 rounded-xl shadow-sm ${
                       message.sender === "user" ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-900"
-                    }`}
+                    } border border-black/5`}
                   >
                     <p className="text-sm">{message.text}</p>
                     {message.sender === "bot" && (
@@ -292,25 +322,26 @@ export function Chatbot() {
               <div ref={messagesEndRef} />
             </div>
           </ScrollArea>
+          )}
 
-          <div className="p-4 border-t">
-            <div className="flex gap-2">
+          <div className="p-3 border-t bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70">
+            <div className="flex gap-2 items-center">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={t("chatbot.placeholder")}
-                className="flex-1"
+                className="flex-1 rounded-full"
               />
               <Button
                 onClick={isListening ? stopListening : startListening}
                 variant="outline"
                 size="sm"
-                className={`${isListening ? "bg-red-100 border-red-300" : "hover:bg-gray-50"}`}
-              >
+                className={`rounded-full ${isListening ? "bg-red-100 border-red-300" : "hover:bg-gray-50"}`}
+                >
                 {isListening ? <MicOff className="h-4 w-4 text-red-600" /> : <Mic className="h-4 w-4" />}
               </Button>
-              <Button onClick={handleSendMessage} size="sm">
+              <Button onClick={handleSendMessage} size="sm" className="rounded-full bg-orange-600 hover:bg-orange-700">
                 <Send className="h-4 w-4" />
               </Button>
             </div>
